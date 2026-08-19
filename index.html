@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker</title>
+<style>
+:root{--bg:#071225;--panel:#0d1a30;--panel2:#101f38;--text:#f4f7ff;--muted:#9baac4;--line:#223452;--purple:#6945ff;--green:#27d7a0;--orange:#ff9c42;--danger:#ff5575}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#061022,#0a1428);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{display:flex;min-height:100vh}.sidebar{width:230px;border-right:1px solid var(--line);padding:22px 14px;position:fixed;inset:0 auto 0 0;background:#071225;z-index:5}
+.logo{font-size:23px;font-weight:800;padding:10px 12px 28px}.logo span{color:#7557ff}.nav button{width:100%;background:transparent;border:0;color:#cbd5e8;padding:14px 16px;text-align:left;border-radius:10px;margin:3px 0;font-size:15px}.nav button.active,.nav button:hover{background:linear-gradient(90deg,#33239a,#211b67);color:white}
+.main{margin-left:230px;width:calc(100% - 230px);padding:28px;max-width:1500px;margin-right:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top h1{margin:0;font-size:28px}.sub{color:var(--muted);font-size:14px;margin-top:5px}.theme{border:1px solid var(--line);background:var(--panel);color:white;border-radius:50%;width:42px;height:42px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{padding:20px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#101e37,#0c172a)}.card .label{color:#aab7cc}.amount{font-size:27px;font-weight:800;margin-top:8px}.purple{border-color:#4534c7}.green{border-color:#126e5d}.orange{border-color:#8c5221}.pink{border-color:#7b2862}
+.formbox{margin-top:20px;padding:22px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#101e37,#0b172b)}.formbox h2{margin:0 0 18px}.form{display:grid;grid-template-columns:1fr 1fr 1.2fr 1fr 1.4fr auto;gap:12px;align-items:end}.field label{display:block;color:#b7c3d8;font-size:13px;margin-bottom:7px}.field input,.field select{width:100%;background:#0b172b;border:1px solid #2a3e5f;color:white;border-radius:9px;padding:11px;outline:none}.field input:focus,.field select:focus{border-color:#7255ff}.add{background:linear-gradient(135deg,#6741ff,#4b2fe0);color:white;border:0;padding:12px 18px;border-radius:9px;font-weight:700}.types{display:flex;gap:8px}.type{flex:1;padding:10px;border:1px solid #2a3e5f;background:#0b172b;color:#bdc8dc;border-radius:9px}.type.selected{background:#5a3bf1;border-color:#806aff;color:white}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.quick button{border:1px solid #334866;background:#0b172b;color:#d5deed;border-radius:20px;padding:8px 13px}.quick button.selected{border-color:#7c5cff;color:white;background:#241b66}
+.sections{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}.section{background:#0d1a30;border:1px solid var(--line);border-radius:17px;overflow:hidden}.sectionhead{display:flex;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}.sectionhead h2{font-size:18px;margin:0}.sectionhead strong{font-size:20px}.list{padding:8px 18px}.item{display:grid;grid-template-columns:90px 1fr 90px 28px;gap:10px;align-items:center;padding:14px 2px;border-bottom:1px solid #1c2b43}.item:last-child{border:0}.cat{color:#aebbd0;font-size:14px}.note{font-size:13px;color:#8090aa}.online .badge{color:#6eeac6}.offline .badge{color:#ffba70}.delete{background:none;border:0;color:#ff5575;font-size:18px}.empty{text-align:center;color:#7e8da6;padding:28px}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:20}.modal.show{display:flex}.modalbox{width:min(430px,92vw);background:#101e35;border:1px solid #34496c;border-radius:18px;padding:24px}.modalbox h3{margin-top:0}.modalbox button{margin-top:14px}
+.light{--bg:#f3f6fb;--panel:#fff;--panel2:#fff;--text:#172033;--muted:#68758a;--line:#d9e1ee}.light body{background:#f3f6fb}.light .sidebar,.light .formbox,.light .card,.light .section{background:#fff}.light .field input,.light .field select,.light .type,.light .quick button{background:#f5f7fb;color:#172033}
+
+.history-top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px}.history-tabs{display:flex;gap:6px}.history-tab{border:1px solid #2a3e5f;background:#0b172b;color:#aebbd0;padding:9px 13px;border-radius:9px}.history-tab.active{background:#5a3bf1;color:white;border-color:#806aff}.history-group{border:1px solid #223452;border-radius:13px;margin:12px 0;overflow:hidden}.group-head{display:flex;justify-content:space-between;padding:13px 15px;background:#101f38}.group-head strong{font-size:15px}.group-body{padding:0 15px}.group-row{display:grid;grid-template-columns:95px 1fr 90px 28px;gap:10px;padding:12px 0;border-bottom:1px solid #1c2b43}.group-row:last-child{border-bottom:0}.profile-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}.profile-card{text-align:center}.avatar{width:82px;height:82px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#7655ff,#3823bd);font-size:25px;font-weight:800}.profile-stat{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #223452;color:#aebbd0}.profile-stat strong{color:white}.developer{position:absolute;bottom:22px;left:28px;color:#71819b;font-size:12px;line-height:1.6}.developer strong{color:#cbd5e8;font-size:14px}.share-row{display:flex;gap:10px;margin-top:18px}.light .history-tab,.light .type{background:#f5f7fb;color:#172033}.light .group-head{background:#f3f6fb}.light .profile-stat strong{color:#172033}
+@media(max-width:1050px){.profile-grid{grid-template-columns:1fr}.history-top{align-items:flex-start;flex-direction:column}}
+@media(max-width:720px){.developer{display:none}.history-tabs{width:100%}.history-tab{flex:1}.group-row{grid-template-columns:70px 1fr 75px 24px}.share-row{flex-direction:column}}
+@media(max-width:1050px){.cards{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr 1fr 1fr}.form .add{width:100%}.sections{grid-template-columns:1fr}}
+@media(max-width:720px){.sidebar{position:static;width:100%;height:auto;border-right:0;border-bottom:1px solid var(--line)}.app{display:block}.main{margin:0;width:100%;padding:16px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;width:auto}.logo{padding-bottom:10px}.cards{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.item{grid-template-columns:70px 1fr 75px 24px}.top h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">💳 Expense <span>Tracker</span></div>
+  <div class="nav">
+    <button class="active" onclick="showSection('dashboard',this)">⌂ Dashboard</button>
+    <button onclick="focusForm(this)">＋ Add Expense</button>
+    <button onclick="showSection('history',this)">☷ History</button>
+    <button onclick="showSection('profile',this)">◉ Profile</button>
+  </div>
+  <div class="developer">Developed by<br><strong>Shrey Patel</strong></div>
+</aside>
+
+<main class="main">
+  <div class="top"><div><h1>Expense Tracker</h1><div class="sub">Keep your daily spending simple and organized.</div></div><button class="theme" onclick="toggleTheme()">☾</button></div>
+
+  <section id="dashboard">
+    <div class="cards">
+      <div class="card purple"><div class="label">Total Spent</div><div class="amount" id="total">₹0</div></div>
+      <div class="card green"><div class="label">Online</div><div class="amount" id="onlineTotal">₹0</div></div>
+      <div class="card orange"><div class="label">Offline</div><div class="amount" id="offlineTotal">₹0</div></div>
+      <div class="card pink"><div class="label">Transactions</div><div class="amount" id="count">0</div></div>
+    </div>
+
+    <div class="formbox" id="addBox">
+      <h2>＋ Add New Expense</h2>
+      <form class="form" id="expenseForm">
+        <div class="field"><label>Amount (₹)</label><input id="amount" type="number" min="1" step="0.01" placeholder="250" required></div>
+        <div class="field"><label>Type</label><div class="types"><button type="button" class="type selected" data-type="online">Online</button><button type="button" class="type" data-type="offline">Offline</button></div></div>
+        <div class="field"><label>Category</label><select id="category"><option>Food</option><option>Travel</option><option>Shopping</option><option>Education</option><option>Entertainment</option><option>Health</option><option>Bills</option><option>Other</option></select></div>
+        <div class="field"><label>Date</label><input id="date" type="date" required></div>
+        <div class="field"><label>Note</label><input id="note" maxlength="60" placeholder="What was it for?"></div>
+        <button class="add" type="submit">Add Expense</button>
+      </form>
+      <div class="quick">
+        <button type="button" onclick="quickCat('Food')">🍔 Food</button><button type="button" onclick="quickCat('Travel')">🚗 Travel</button><button type="button" onclick="quickCat('Shopping')">🛍 Shopping</button><button type="button" onclick="quickCat('Education')">🎓 Education</button><button type="button" onclick="quickCat('Entertainment')">🎮 Entertainment</button><button type="button" onclick="quickCat('Other')">📦 Other</button>
+      </div>
+    </div>
+
+    <div class="sections">
+      <div class="section online"><div class="sectionhead"><h2>🌐 Online Expenses</h2><strong id="onlineHead">₹0</strong></div><div class="list" id="onlineList"></div></div>
+      <div class="section offline"><div class="sectionhead"><h2>🏪 Offline Expenses</h2><strong id="offlineHead">₹0</strong></div><div class="list" id="offlineList"></div></div>
+    </div>
+  </section>
+
+  <section id="history" style="display:none">
+    <div class="formbox">
+      <div class="history-top">
+        <div><h2>Expense History</h2><div class="sub">See your spending grouped by week or month.</div></div>
+        <div class="history-tabs">
+          <button class="history-tab active" onclick="setHistoryMode('week',this)">Weekly</button>
+          <button class="history-tab" onclick="setHistoryMode('month',this)">Monthly</button>
+          <button class="history-tab" onclick="setHistoryMode('all',this)">All</button>
+        </div>
+      </div>
+      <div id="historySummary"></div>
+      <div id="historyList"></div>
+    </div>
+  </section>
+
+  <section id="profile" style="display:none">
+    <div class="profile-grid">
+      <div class="formbox profile-card">
+        <div class="avatar" id="avatar">SP</div>
+        <h2 id="profileName">Shrey Patel</h2>
+        <div class="sub">Personal Expense Tracker</div>
+        <div class="profile-stat"><span>Total transactions</span><strong id="profileCount">0</strong></div>
+        <div class="profile-stat"><span>Total spending</span><strong id="profileSpent">₹0</strong></div>
+      </div>
+      <div class="formbox">
+        <h2>Profile</h2>
+        <div class="field"><label>Your name</label><input id="userName" value="Shrey Patel" maxlength="40"></div>
+        <div class="field" style="margin-top:14px"><label>Short description</label><input id="userBio" value="Tracking my daily expenses." maxlength="100"></div>
+        <button class="add" style="margin-top:16px" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+    <div class="formbox developer-box">
+      <h2>👨‍💻 Developer</h2>
+      <p><strong>Shrey Patel</strong></p>
+      <div class="sub">Built as a simple personal expense tracker for everyday use.</div>
+      <div class="share-row">
+        <button class="add" onclick="shareApp()">↗ Share Website</button>
+        <button class="type" onclick="downloadData()">↓ Backup Data</button>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox"><h3>Delete expense?</h3><div class="sub">This will permanently remove the selected expense from this browser.</div><button class="add" onclick="confirmDelete()">Delete</button> <button class="type" onclick="closeModal()">Cancel</button></div></div>
+
+<script>
+const KEY='expenseTrackerDataV1';
+let expenses=JSON.parse(localStorage.getItem(KEY)||'[]');
+let selectedType='online', deleteId=null;
+document.getElementById('date').value=new Date().toISOString().slice(0,10);
+
+document.querySelectorAll('.type').forEach(b=>b.onclick=()=>{document.querySelectorAll('.type').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selectedType=b.dataset.type});
+
+document.getElementById('expenseForm').onsubmit=e=>{
+ e.preventDefault();
+ const amount=Number(document.getElementById('amount').value);
+ if(!amount||amount<=0)return;
+ expenses.unshift({id:Date.now(),amount,type:selectedType,category:document.getElementById('category').value,date:document.getElementById('date').value,note:document.getElementById('note').value.trim()});
+ save(); e.target.reset(); document.getElementById('date').value=new Date().toISOString().slice(0,10); document.querySelectorAll('.type').forEach(x=>x.classList.remove('selected'));document.querySelector('[data-type="online"]').classList.add('selected');selectedType='online';
+};
+function save(){localStorage.setItem(KEY,JSON.stringify(expenses));render()}
+function money(n){return '₹'+n.toLocaleString('en-IN',{maximumFractionDigits:2})}
+function render(){
+ const online=expenses.filter(x=>x.type==='online'), offline=expenses.filter(x=>x.type==='offline');
+ const sum=a=>a.reduce((s,x)=>s+x.amount,0);
+ document.getElementById('total').textContent=money(sum(expenses));document.getElementById('onlineTotal').textContent=money(sum(online));document.getElementById('offlineTotal').textContent=money(sum(offline));document.getElementById('count').textContent=expenses.length;
+ document.getElementById('onlineHead').textContent=money(sum(online));document.getElementById('offlineHead').textContent=money(sum(offline));
+ draw('onlineList',online);draw('offlineList',offline);drawHistory();loadProfile();
+}
+function draw(id,arr){const el=document.getElementById(id); if(!arr.length){el.innerHTML='<div class="empty">No expenses yet.</div>';return} el.innerHTML=arr.map(x=>`<div class="item"><div class="badge">${x.date.slice(5)}</div><div><div class="cat">${x.category}</div><div class="note">${escapeHtml(x.note||'No note')}</div></div><strong>${money(x.amount)}</strong><button class="delete" onclick="askDelete(${x.id})">×</button></div>`).join('')}
+let historyMode='week';
+function getWeekKey(dateString){
+ const d=new Date(dateString+'T00:00:00'); const day=(d.getDay()+6)%7;
+ const monday=new Date(d); monday.setDate(d.getDate()-day);
+ const sunday=new Date(monday); sunday.setDate(monday.getDate()+6);
+ return `${monday.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} – ${sunday.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}`;
+}
+function getMonthKey(dateString){const d=new Date(dateString+'T00:00:00');return d.toLocaleDateString('en-IN',{month:'long',year:'numeric'});}
+function setHistoryMode(mode,btn){historyMode=mode;document.querySelectorAll('.history-tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');drawHistory();}
+function drawHistory(){
+ const el=document.getElementById('historyList'), summary=document.getElementById('historySummary');
+ if(!expenses.length){el.innerHTML='<div class="empty">Your expense history will appear here.</div>';summary.innerHTML='';return}
+ let groups={};
+ expenses.forEach(x=>{const key=historyMode==='week'?getWeekKey(x.date):historyMode==='month'?getMonthKey(x.date):'All Expenses';(groups[key]??=[]).push(x)});
+ const keys=Object.keys(groups).sort((a,b)=>a<b?1:-1);
+ const grand=expenses.reduce((s,x)=>s+x.amount,0);
+ summary.innerHTML=`<div class="sub" style="margin-bottom:12px"><strong style="color:var(--text)">${money(grand)}</strong> across ${expenses.length} transaction${expenses.length===1?'':'s'}</div>`;
+ el.innerHTML=keys.map(key=>{
+   const arr=groups[key].sort((a,b)=>b.date.localeCompare(a.date)), total=arr.reduce((s,x)=>s+x.amount,0);
+   return `<div class="history-group"><div class="group-head"><strong>${escapeHtml(key)}</strong><strong>${money(total)}</strong></div><div class="group-body">${arr.map(x=>`<div class="group-row"><div>${x.date.slice(5)}</div><div><div class="cat">${x.type==='online'?'🌐':'🏪'} ${x.category}</div><div class="note">${escapeHtml(x.note||'No note')}</div></div><strong>${money(x.amount)}</strong><button class="delete" onclick="askDelete(${x.id})">×</button></div>`).join('')}</div></div>`;
+ }).join('');
+}
+function loadProfile(){
+ const pr=JSON.parse(localStorage.getItem('expenseProfileV1')||'{"name":"Shrey Patel","bio":"Tracking my daily expenses."}');
+ document.getElementById('userName').value=pr.name;document.getElementById('userBio').value=pr.bio;
+ document.getElementById('profileName').textContent=pr.name;document.getElementById('avatar').textContent=(pr.name||'U').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+ document.getElementById('profileCount').textContent=expenses.length;document.getElementById('profileSpent').textContent=money(expenses.reduce((s,x)=>s+x.amount,0));
+}
+function saveProfile(){const name=document.getElementById('userName').value.trim()||'User',bio=document.getElementById('userBio').value.trim();localStorage.setItem('expenseProfileV1',JSON.stringify({name,bio}));loadProfile();alert('Profile saved!')}
+async function shareApp(){
+ const text='Check out my Expense Tracker — a simple way to track online and offline daily expenses.';
+ if(navigator.share){try{await navigator.share({title:'Expense Tracker',text})}catch(e){}}
+ else{await navigator.clipboard?.writeText(location.href);alert('Website link copied. You can send it to your friends.')}
+}
+function downloadData(){
+ const blob=new Blob([JSON.stringify({profile:JSON.parse(localStorage.getItem('expenseProfileV1')||'{}'),expenses},null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='expense-tracker-backup.json';a.click();URL.revokeObjectURL(a.href);
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function quickCat(c){document.getElementById('category').value=c;document.querySelector('.formbox').scrollIntoView({behavior:'smooth',block:'center'})}
+function askDelete(id){deleteId=id;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show');deleteId=null}
+function confirmDelete(){expenses=expenses.filter(x=>x.id!==deleteId);save();closeModal()}
+function showSection(name,btn){document.getElementById('dashboard').style.display=name==='dashboard'?'block':'none';document.getElementById('history').style.display=name==='history'?'block':'none';document.getElementById('profile').style.display=name==='profile'?'block':'none';document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active')}
+function focusForm(btn){showSection('dashboard');document.getElementById('addBox').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('amount').focus()}
+function toggleTheme(){document.documentElement.classList.toggle('light');localStorage.setItem('expenseTheme',document.documentElement.classList.contains('light')?'light':'dark')}
+if(localStorage.getItem('expenseTheme')==='light')document.documentElement.classList.add('light');
+document.getElementById('profile').style.display='none';
+render();
+</script>
+</body>
+</html>
